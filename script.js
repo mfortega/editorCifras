@@ -1,5 +1,5 @@
 // ==================== MODELO E ESTADO GLOBAL ====================
-let chordModel = [];       // estrutura: linhas de { text, chord }
+let chordModel = [];
 let activePopup = null;
 
 // ==================== DOM ELEMENTOS ====================
@@ -14,7 +14,7 @@ const saveSongBtn = document.getElementById('saveSongBtn');
 const newSongBtn = document.getElementById('newSongBtn');
 const songsListDiv = document.getElementById('songsList');
 
-// ==================== FUNÇÕES AUXILIARES (CORE) ====================
+// ==================== FUNÇÕES AUXILIARES ====================
 function closePopup() {
     if (activePopup) {
         activePopup.remove();
@@ -32,7 +32,6 @@ function escapeHtml(str) {
     });
 }
 
-// Converte texto bruto em modelo (sem acordes)
 function buildModelFromLyrics(text) {
     const lines = text.split(/\r?\n/);
     const newModel = [];
@@ -48,7 +47,6 @@ function buildModelFromLyrics(text) {
     return newModel;
 }
 
-// Reconstrói texto (letra) a partir do modelo atual
 function modelToText(model) {
     let lines = [];
     for (let lineWords of model) {
@@ -62,7 +60,6 @@ function modelToText(model) {
     return lines.join('\n');
 }
 
-// Renderiza a área de cifra interativa
 function renderChordSheet() {
     if (!chordSheetDiv) return;
     chordSheetDiv.innerHTML = "";
@@ -111,12 +108,14 @@ function renderChordSheet() {
             wordContainer.appendChild(chordSpan);
             wordContainer.appendChild(wordSpan);
 
-            wordContainer.addEventListener('click', (function(l, w) {
-                return function(event) {
-                    event.stopPropagation();
-                    openChordPopup(event, l, w);
-                };
-            })(lineIdx, wordIdx));
+            // Adiciona suporte para clique e toque
+            const handleInteraction = (event) => {
+                event.preventDefault(); // evita zoom duplo no mobile
+                event.stopPropagation();
+                openChordPopup(event, lineIdx, wordIdx);
+            };
+            wordContainer.addEventListener('click', handleInteraction);
+            wordContainer.addEventListener('touchstart', handleInteraction, { passive: false });
 
             lineDiv.appendChild(wordContainer);
         }
@@ -131,18 +130,34 @@ function openChordPopup(event, lineIndex, wordIndex) {
     if (!chordModel[lineIndex] || !chordModel[lineIndex][wordIndex]) return;
     const currentChord = chordModel[lineIndex][wordIndex].chord || "";
 
-    const targetElem = event.currentTarget;
-    const rect = targetElem.getBoundingClientRect();
-    const scrollY = window.scrollY;
-    const scrollX = window.scrollX;
+    // Obtém coordenadas do toque/clique
+    let clientX, clientY;
+    if (event.touches) {
+        // evento de toque
+        clientX = event.touches[0].clientX;
+        clientY = event.touches[0].clientY;
+    } else {
+        clientX = event.clientX;
+        clientY = event.clientY;
+    }
 
     const popup = document.createElement('div');
     popup.className = 'chord-popup';
-    popup.style.left = `${Math.min(rect.left + scrollX + 10, window.innerWidth - 280)}px`;
-    popup.style.top = `${rect.top + scrollY - 70}px`;
-    if (rect.top < 100) {
-        popup.style.top = `${rect.bottom + scrollY + 10}px`;
+    
+    // Posicionamento inteligente: centraliza horizontalmente e ajusta vertical
+    const popupWidth = 280;
+    let left = clientX - (popupWidth / 2);
+    left = Math.max(10, Math.min(left, window.innerWidth - popupWidth - 10));
+    
+    let top = clientY - 80; // acima do dedo
+    if (top < 20) {
+        top = clientY + 30; // abaixo se não couber em cima
     }
+    
+    popup.style.left = `${left}px`;
+    popup.style.top = `${top}px`;
+    popup.style.position = 'fixed';
+    popup.style.zIndex = '10000';
 
     popup.innerHTML = `
         <div style="font-weight: bold; margin-bottom: 6px; text-align:center;">🎵 Adicionar Acorde</div>
@@ -173,7 +188,11 @@ function openChordPopup(event, lineIndex, wordIndex) {
     activePopup = popup;
 
     const chordInput = popup.querySelector('#chordInputPopup');
-    if (chordInput) chordInput.focus();
+    if (chordInput) {
+        chordInput.focus();
+        // em mobile, abrir teclado suavemente
+        chordInput.click();
+    }
 
     const updateChordAndRender = (newChordValue) => {
         let finalChord = null;
@@ -182,7 +201,6 @@ function openChordPopup(event, lineIndex, wordIndex) {
         }
         chordModel[lineIndex][wordIndex].chord = finalChord;
         renderChordSheet();
-        // Atualiza também o textarea para manter sincronia (opcional)
         lyricsTextarea.value = modelToText(chordModel);
         closePopup();
     };
@@ -203,23 +221,26 @@ function openChordPopup(event, lineIndex, wordIndex) {
         });
     });
 
+    // Fechar ao clicar/tocar fora
     const closeHandler = (e) => {
         if (activePopup && !activePopup.contains(e.target)) {
             closePopup();
             document.removeEventListener('click', closeHandler);
+            document.removeEventListener('touchstart', closeHandler);
         }
     };
-    setTimeout(() => document.addEventListener('click', closeHandler), 10);
+    setTimeout(() => {
+        document.addEventListener('click', closeHandler);
+        document.addEventListener('touchstart', closeHandler);
+    }, 10);
 }
 
-// Carrega letra do textarea para o modelo
 function loadLyricsToModel() {
     const rawText = lyricsTextarea.value;
     chordModel = buildModelFromLyrics(rawText);
     renderChordSheet();
 }
 
-// Remove todos os acordes
 function clearAllChords() {
     for (let line of chordModel) {
         for (let word of line) {
@@ -230,7 +251,6 @@ function clearAllChords() {
     lyricsTextarea.value = modelToText(chordModel);
 }
 
-// Exemplo prático
 function loadExample() {
     const exampleSong = `Imagine
 All the people
@@ -257,7 +277,6 @@ Luz que vem`;
     }, 20);
 }
 
-// ==================== EXPORTAR PDF ====================
 function exportToPDF() {
     const elementToExport = document.getElementById('chordSheetContainer');
     if (!elementToExport || elementToExport.innerText.includes("Nenhuma letra carregada")) {
@@ -294,17 +313,17 @@ function exportToPDF() {
     wrapper.appendChild(cloneSheet);
     
     const opt = {
-        margin:        [0.5, 0.5, 0.5, 0.5],
-        filename:     `${songTitle.replace(/[^a-z0-9]/gi, '_')}.pdf`,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, letterRendering: true, useCORS: true, logging: false },
-        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+        margin: [0.5, 0.5, 0.5, 0.5],
+        filename: `${songTitle.replace(/[^a-z0-9]/gi, '_')}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, letterRendering: true, useCORS: true, logging: false },
+        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
     };
     
     html2pdf().set(opt).from(wrapper).save();
 }
 
-// ==================== GERENCIAMENTO DE MÚSICAS (localStorage) ====================
+// ==================== GERENCIAMENTO DE MÚSICAS ====================
 const STORAGE_KEY = "saved_chord_songs";
 
 function getSavedSongs() {
@@ -332,11 +351,19 @@ function renderSongsList() {
         nameSpan.textContent = song.nome;
         nameSpan.title = "Clique para carregar";
         nameSpan.addEventListener('click', () => loadSongById(song.id));
+        nameSpan.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            loadSongById(song.id);
+        });
         const deleteBtn = document.createElement('button');
         deleteBtn.textContent = "✖";
         deleteBtn.className = "delete-song";
         deleteBtn.title = "Excluir música";
         deleteBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            deleteSongById(song.id);
+        });
+        deleteBtn.addEventListener('touchstart', (e) => {
             e.stopPropagation();
             deleteSongById(song.id);
         });
@@ -357,20 +384,17 @@ function saveCurrentSong() {
         return;
     }
     const songs = getSavedSongs();
-    // Verifica se já existe música com mesmo nome
     const existingIndex = songs.findIndex(s => s.nome.toLowerCase() === nome.toLowerCase());
     if (existingIndex !== -1) {
         if (!confirm(`Já existe uma música chamada "${nome}". Deseja sobrescrevê-la?`)) {
             return;
         }
-        // Sobrescrever
         songs[existingIndex] = {
             id: songs[existingIndex].id,
             nome: nome,
-            chordModel: JSON.parse(JSON.stringify(chordModel)) // deep copy
+            chordModel: JSON.parse(JSON.stringify(chordModel))
         };
     } else {
-        // Nova música
         const newId = Date.now().toString() + '-' + Math.random().toString(36).substr(2, 6);
         songs.push({
             id: newId,
@@ -387,10 +411,8 @@ function loadSongById(id) {
     const songs = getSavedSongs();
     const song = songs.find(s => s.id === id);
     if (!song) return;
-    // Restaurar modelo e nome
     chordModel = JSON.parse(JSON.stringify(song.chordModel));
     songNameInput.value = song.nome;
-    // Reconstruir letra no textarea a partir do modelo
     lyricsTextarea.value = modelToText(chordModel);
     renderChordSheet();
     closePopup();
@@ -401,7 +423,6 @@ function deleteSongById(id) {
     const newSongs = songs.filter(s => s.id !== id);
     saveSongsToStorage(newSongs);
     renderSongsList();
-    // Se a música atual for a excluída, opcionalmente limpar? Não precisa.
 }
 
 function newSong() {
@@ -417,7 +438,7 @@ function newSong() {
     closePopup();
 }
 
-// ==================== EVENT LISTENERS E INICIALIZAÇÃO ====================
+// ==================== EVENT LISTENERS ====================
 refreshBtn.addEventListener('click', loadLyricsToModel);
 clearChordsBtn.addEventListener('click', clearAllChords);
 exampleBtn.addEventListener('click', loadExample);
@@ -425,11 +446,14 @@ exportPdfBtn.addEventListener('click', exportToPDF);
 saveSongBtn.addEventListener('click', saveCurrentSong);
 newSongBtn.addEventListener('click', newSong);
 
-// Sincroniza o textarea com o modelo quando o usuário digitar manualmente (opcional)
-lyricsTextarea.addEventListener('input', () => {
-    // Não recarrega automaticamente para preservar acordes? Melhor deixar explícito com botão "Carregar"
-    // Mas para manter coerência, se digitar sem carregar, o modelo fica dessincronizado.
-    // O usuário deve clicar em "Carregar" para sincronizar. Isso é intencional.
+// Para mobile, garantir que os botões tenham evento touch também
+const allButtons = document.querySelectorAll('button');
+allButtons.forEach(btn => {
+    btn.addEventListener('touchstart', (e) => {
+        // apenas para evitar delay, mas o click já funciona
+        e.preventDefault();
+        btn.click();
+    }, { passive: false });
 });
 
 function initDefault() {

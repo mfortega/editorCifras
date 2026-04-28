@@ -397,3 +397,25 @@ footer {
     .btn-group button { padding: 0.4rem 0.8rem; font-size: 0.75rem;}
     .song-info { flex-direction: column; align-items: stretch; }
 }
+
+/* Adicione estas regras ao final do arquivo style.css existente */
+/* Melhorias para mobile */
+@media (max-width: 750px) {
+    .word-container {
+        cursor: pointer;
+        touch-action: manipulation; /* melhora resposta ao toque */
+        padding: 8px 2px; /* área de toque maior */
+    }
+    .chord-popup {
+        width: 280px;
+        left: 5% !important; /* fallback, mas será dinâmico via JS */
+        right: 5%;
+    }
+    .popup-buttons button {
+        padding: 8px 12px; /* botões maiores no mobile */
+    }
+    .suggest-btn {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+}
