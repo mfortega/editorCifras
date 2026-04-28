@@ -1,2 +1,1 @@
-# editorCifras
-Editor de Cifras
+Editor de crifras musicais
