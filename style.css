@@ -1,0 +1,399 @@
+* {
+    box-sizing: border-box;
+    user-select: none; /* Evita seleção indesejada no editor, mas não interfere na usabilidade */
+}
+
+body {
+    font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+    background: linear-gradient(145deg, #f5f7fc 0%, #eef2f6 100%);
+    margin: 0;
+    padding: 24px 20px;
+    color: #1e2a3a;
+}
+
+.container {
+    max-width: 1300px;
+    margin: 0 auto;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(1px);
+    border-radius: 2rem;
+    box-shadow: 0 20px 35px -12px rgba(0,0,0,0.2);
+    overflow: hidden;
+    transition: all 0.2s;
+}
+
+/* cabeçalho */
+.header {
+    background: #0b2b26;
+    color: #f9e7c2;
+    padding: 1.5rem 2rem;
+    text-align: center;
+    border-bottom: 3px solid #f4a261;
+}
+.header h1 {
+    margin: 0;
+    font-weight: 700;
+    font-size: 1.9rem;
+    letter-spacing: -0.5px;
+}
+.header p {
+    margin: 0.5rem 0 0;
+    opacity: 0.9;
+    font-size: 0.95rem;
+}
+
+/* duas colunas flex */
+.editor-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.8rem;
+    padding: 2rem 2rem 1rem;
+}
+
+.painel-entrada {
+    flex: 1.2;
+    min-width: 280px;
+    background: #ffffffdd;
+    border-radius: 1.5rem;
+    padding: 1.2rem;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,240,0.6);
+}
+
+.painel-cifra {
+    flex: 2.5;
+    min-width: 320px;
+    background: #fffef7;
+    border-radius: 1.5rem;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+    padding: 1.2rem;
+    transition: all 0.2s;
+    border: 1px solid #e9e0cf;
+}
+
+.song-info {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+.song-info label {
+    font-weight: bold;
+    color: #2a5f5a;
+}
+.song-info input {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 2rem;
+    border: 1px solid #cfdde6;
+    background: #fefcf5;
+    font-size: 0.9rem;
+    outline: none;
+}
+.song-info input:focus {
+    border-color: #f4a261;
+    box-shadow: 0 0 0 2px rgba(244,162,97,0.2);
+}
+
+textarea {
+    width: 100%;
+    height: 260px;
+    padding: 1rem;
+    font-family: 'Courier New', 'Fira Code', monospace;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: 1.2rem;
+    border: 1px solid #cfdde6;
+    background: #fefcf5;
+    resize: vertical;
+    outline: none;
+    transition: 0.2s;
+    color: #1e2f3e;
+}
+textarea:focus {
+    border-color: #f4a261;
+    box-shadow: 0 0 0 3px rgba(244,162,97,0.2);
+}
+
+.btn-group {
+    margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    justify-content: space-between;
+}
+button {
+    background: #2a5f5a;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 3rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: white;
+    cursor: pointer;
+    transition: 0.2s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+button i { font-style: normal; font-weight: bold; }
+button:hover {
+    background: #1e4541;
+    transform: translateY(-2px);
+}
+.btn-sec {
+    background: #5c6e6b;
+}
+.btn-sec:hover {
+    background: #3f5450;
+}
+.btn-outline {
+    background: #d9c9a3;
+    color: #2c423f;
+}
+.btn-outline:hover {
+    background: #cfbc8d;
+    color: #1e2a2a;
+}
+.btn-pdf {
+    background: #b45f06;
+}
+.btn-pdf:hover {
+    background: #8e4704;
+}
+.btn-save {
+    background: #2a6b5e;
+}
+.btn-save:hover {
+    background: #1e5449;
+}
+.btn-new {
+    background: #6c757d;
+}
+.btn-new:hover {
+    background: #565e64;
+}
+/* Área de cifra */
+.chord-sheet {
+    background: #fffaf0;
+    border-radius: 1.2rem;
+    padding: 1rem;
+    min-height: 380px;
+    max-height: 500px;
+    overflow-y: auto;
+    font-family: 'Segoe UI', system-ui, 'Courier New', monospace;
+    box-shadow: inset 0 0 0 1px #f3e9d2, 0 2px 5px rgba(0,0,0,0.02);
+}
+.line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    margin-bottom: 1.2rem;
+    padding: 0.2rem 0;
+    border-left: 3px solid transparent;
+    transition: 0.1s;
+}
+.word-container {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 12px;
+    margin-bottom: 6px;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+    border-radius: 12px;
+    padding: 4px 2px;
+}
+.word-container:hover {
+    background: #f9efdb;
+    transform: scale(1.02);
+}
+.chord {
+    font-size: 0.75rem;
+    font-weight: 800;
+    background: #ffecb3;
+    color: #b45f06;
+    padding: 0.1rem 0.4rem;
+    border-radius: 30px;
+    margin-bottom: 2px;
+    letter-spacing: 0.5px;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05);
+    min-width: 40px;
+    text-align: center;
+    white-space: nowrap;
+}
+.chord:empty {
+    background: transparent;
+    box-shadow: none;
+    min-width: 20px;
+}
+.word {
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: #2c3e2f;
+    background: #ffffffcc;
+    padding: 0.1rem 0.2rem;
+    border-radius: 12px;
+    line-height: 1.4;
+    white-space: nowrap;
+}
+.empty-line {
+    min-height: 1.7rem;
+    background: #f7f2e1;
+    border-radius: 20px;
+    margin-bottom: 12px;
+}
+
+/* Popup */
+.chord-popup {
+    position: fixed;
+    z-index: 1000;
+    background: #fffef2;
+    border-radius: 2rem;
+    padding: 0.9rem 1rem;
+    width: 260px;
+    box-shadow: 0 20px 30px -10px rgba(0,0,0,0.3);
+    border: 1px solid #e2cf9e;
+    font-family: system-ui;
+}
+.chord-popup input {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 1rem;
+    border-radius: 3rem;
+    border: 1px solid #cbae76;
+    background: #fff7e8;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 8px;
+    outline: none;
+}
+.chord-popup input:focus {
+    border-color: #f4a261;
+}
+.popup-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 6px;
+    justify-content: center;
+}
+.popup-buttons button {
+    background: #679b91;
+    padding: 5px 10px;
+    font-size: 0.75rem;
+    border-radius: 2rem;
+}
+.chord-suggest {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 8px 0 5px;
+    justify-content: center;
+}
+.suggest-btn {
+    background: #e9d6b0;
+    color: #2d4a44;
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 4px 10px;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: 0.1s;
+}
+.suggest-btn:hover {
+    background: #dbbc7c;
+    transform: scale(0.97);
+}
+.info-note {
+    font-size: 0.75rem;
+    color: #7a6a4b;
+    text-align: center;
+    margin-top: 8px;
+}
+footer {
+    padding: 1rem;
+    text-align: center;
+    font-size: 0.75rem;
+    border-top: 1px solid #e9dfc7;
+    background: #fffcf0;
+    color: #4f6742;
+}
+
+/* Painel de músicas salvas */
+.saved-songs-panel {
+    padding: 0 2rem 1.5rem 2rem;
+}
+.saved-songs-panel h3 {
+    margin: 0 0 12px 0;
+    color: #2a5f5a;
+    font-weight: 600;
+}
+.songs-list {
+    background: #ffffffcc;
+    border-radius: 1.2rem;
+    padding: 0.8rem;
+    max-height: 200px;
+    overflow-y: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    border: 1px solid #e9dfc7;
+}
+.song-item {
+    background: #fff6e8;
+    border-radius: 3rem;
+    padding: 6px 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: 0.1s;
+}
+.song-item:hover {
+    background: #f0e4ce;
+    transform: scale(0.98);
+}
+.song-name {
+    font-weight: bold;
+    cursor: pointer;
+    color: #2c423f;
+}
+.song-name:hover {
+    text-decoration: underline;
+}
+.delete-song {
+    background: #bc6c25;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    font-size: 12px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+.delete-song:hover {
+    background: #9c5518;
+    transform: none;
+}
+.empty-message {
+    color: #9c8866;
+    font-style: italic;
+    padding: 8px;
+}
+
+@media (max-width: 750px) {
+    .word-container { margin-right: 6px; }
+    .word { font-size: 0.9rem; }
+    .chord { font-size: 0.65rem; }
+    .btn-group button { padding: 0.4rem 0.8rem; font-size: 0.75rem;}
+    .song-info { flex-direction: column; align-items: stretch; }
+}

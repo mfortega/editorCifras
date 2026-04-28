@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Editor de Cifras Musicais | Salvar e Carregar Músicas</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Biblioteca para exportar PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🎵 Editor de Cifras | Acorde na Palavra</h1>
+        <p>Digite a letra da música ▼ clique em qualquer palavra para adicionar/editar a NOTA MUSICAL (acorde)</p>
+    </div>
+    <div class="editor-grid">
+        <div class="painel-entrada">
+            <!-- NOVO: Campo nome da música e botões de salvar/novo -->
+            <div class="song-info">
+                <label for="songName">🎵 Nome da música:</label>
+                <input type="text" id="songName" placeholder="Ex: Minha Canção" style="flex: 1;">
+                <div class="btn-group" style="margin-top: 8px;">
+                    <button id="saveSongBtn" class="btn-save">💾 Salvar Música</button>
+                    <button id="newSongBtn" class="btn-new">✨ Nova Música</button>
+                </div>
+            </div>
+            <hr style="margin: 12px 0;">
+            <label style="font-weight: 600; margin-bottom: 8px; display: block;">📝 Letra da música:</label>
+            <textarea id="lyricsInput" placeholder="Exemplo:
+Eu olhei pro céu
+E vi você brilhar
+Sol da manhã
+Me fez sonhar"></textarea>
+            <div class="btn-group">
+                <button id="refreshBtn">✨ Carregar / Atualizar Cifra</button>
+                <button id="clearChordsBtn" class="btn-sec">🗑️ Remover Todos os Acordes</button>
+                <button id="exportPdfBtn" class="btn-pdf">📄 Exportar PDF</button>
+                <button id="exampleBtn" class="btn-outline">🎸 Exemplo Prático</button>
+            </div>
+            <div class="info-note" style="margin-top: 12px;">
+                💡 Dica: clique sobre qualquer palavra → escolha uma nota (C, Dm, G7, Am7...) ou crie seu próprio acorde.
+            </div>
+        </div>
+        <div class="painel-cifra">
+            <div style="font-weight: 600; margin-bottom: 12px; display: flex; justify-content: space-between;">
+                <span>🎼 Cifra interativa (clique nas palavras)</span>
+                <span style="font-size: 0.7rem;">🔘 acorde acima da palavra</span>
+            </div>
+            <div id="chordSheetContainer" class="chord-sheet">
+                <div style="text-align: center; color: #9c8866;">Carregue a letra ou digite e clique em "Carregar"</div>
+            </div>
+        </div>
+    </div>
+    <!-- NOVO: Lista de músicas salvas -->
+    <div class="saved-songs-panel">
+        <h3>📚 Minhas Músicas Salvas</h3>
+        <div id="songsList" class="songs-list">
+            <div class="empty-message">Nenhuma música salva ainda. Salve sua primeira música!</div>
+        </div>
+    </div>
+    <footer>
+        🎹 Editor de cifras • Clique na palavra → atribua acorde • Exporte seu PDF • Salve suas músicas.
+    </footer>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
